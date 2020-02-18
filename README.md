@@ -10,12 +10,12 @@
 
     export const fn = (input) => input + " postfix";
 
-    export const it = async function*(prefix) {
+    export const it = async function*(mul) {
         const arr = [1, 2, 3];
 
         while (arr.length) {
             yield new Promise((resolve) => {
-                setTimeout(() => resolve(prefix + ' ' + arr.shift()), 1000);
+                setTimeout(() => resolve(mul * arr.shift()), 1000);
             });
         }
     };
@@ -32,9 +32,9 @@
     portl.fn('from client').then(console.log)
     // => from client postfix
 
-    portl.it('#').subscribe(console.log)
-    // => # 1
-    // => # 2
-    // => # 3
+    portl.it(3).subscribe(console.log)
+    // => 3
+    // => 6
+    // => 9
 
    ```
