@@ -7,58 +7,70 @@
   </head>
   <body>
     <script>
-      window.portl = new Proxy(
-        {},
-        {
-          get: (target, key, proxy) => (...data) => {
-            const prom = fetch(`http://localhost:8000/${key}`, {
-              method: "POST", // *GET, POST, PUT, DELETE, etc.
+      var connection = new WebSocket("ws://localhost:8080");
 
-              headers: {
-                "Content-Type": "application/json"
+      const cbs = [];
+      const freeIDs = [];
+      window.id = freeIDs;
+
+      connection.onopen = function() {
+        window.portl = new Proxy(
+          {},
+          {
+            get: (target, key, proxy) => (...args) => ({
+              _setID: function(cb) {
+                let id = freeIDs.shift();
+                if (id !== undefined) {
+                  cbs[id] = cb;
+                } else {
+                  id = cbs.push(cb) - 1;
+                }
+                this.id = id;
+              },
+              then: function(cb) {
+                this._setID(cb);
+                connection.send(
+                  JSON.stringify({ fn: key, once: true, args, id: this.id })
+                );
               },
 
-              body: JSON.stringify(data)
-            });
-
-            return {
-              then: (cb) =>
-                prom
-                  .then((response) => {
-                    if (!response.ok) {
-                      return response.text().then((error) => {
-                        throw new Error(error);
-                      });
-                    } else {
-                      return response.json();
-                    }
-                  })
-                  .then(cb),
-
-              subscribe: (cb) => {
-                prom.then((response) => {
-                  const reader = response.body.getReader();
-                  var dec = new TextDecoder("utf-8");
-
-                  reader.read().then(function processText({ done, value }) {
-                    // Result objects contain two properties:
-                    // done  - true if the stream has already given you all its data.
-                    // value - some data. Always undefined when done is true.
-                    if (done) {
-                      console.log("Stream complete");
-
-                      return;
-                    }
-
-                    cb(dec.decode(value));
-                    return reader.read().then(processText);
-                  });
-                });
+              subscribe: function(cb) {
+                this._setID(cb);
+                connection.send(
+                  JSON.stringify({ fn: key, once: false, args, id: this.id })
+                );
+              },
+              unsubscribe: function() {
+                console.log(this);
+                connection.send(
+                  JSON.stringify({ fn: key, done: true, id: this.id })
+                );
               }
-            };
+            })
+          }
+        );
+      };
+
+      const unsubscribeID = (id) => {
+        freeIDs.push(id);
+        cbs[id] = () => {};
+      };
+
+      connection.onmessage = function({ data }) {
+        const { id, ret, once, done } = JSON.parse(data);
+        if (done) {
+          unsubscribeID(id);
+        } else {
+          cbs[id](ret);
+          if (once) {
+            unsubscribeID(id);
           }
         }
-      );
+      };
+
+      connection.onerror = function(error) {
+        console.log("WebSocket Error " + error);
+      };
     </script>
   </body>
 </html>
