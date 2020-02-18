@@ -7,16 +7,17 @@
 
     ```javascript
     // serve.js
+
     export const fn = (input) => input + " postfix";
 
     export const it = async function*(prefix) {
-    const arr = [1, 2, 3];
+        const arr = [1, 2, 3];
 
-    while (arr.length) {
-        yield new Promise((resolve) => {
-        setTimeout(() => resolve(prefix + ' ' + arr.shift()), 1000);
-        });
-    }
+        while (arr.length) {
+            yield new Promise((resolve) => {
+                setTimeout(() => resolve(prefix + ' ' + arr.shift()), 1000);
+            });
+        }
     };
     ```
 2. Run the server script with the file `./serve.js` as argument
@@ -28,12 +29,12 @@
    ```js
     import portl from "https://gitcdn.xyz/repo/FalkZ/portl/master/portl-client.js";
 
-      portl.fn('from client').then(console.log)
-      // => from client postfix
+    portl.fn('from client').then(console.log)
+    // => from client postfix
 
-      portl.it('#').subscribe(console.log)
-      // => # 1
-      // => # 2
-      // => # 3
+    portl.it('#').subscribe(console.log)
+    // => # 1
+    // => # 2
+    // => # 3
 
    ```
