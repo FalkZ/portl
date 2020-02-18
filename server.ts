@@ -8,8 +8,9 @@ import {
 } from "https://deno.land/std/ws/mod.ts";
 
 /** websocket echo server */
-// const port = Deno.args[1] || "8080";
-export const ws = (cb) => {
+
+export const ws = async (cb) => {
+  const port = Deno.args[1] || "8080";
   console.log(`websocket server is running on :${port}`);
   for await (const req of serve(`:${port}`)) {
     const { headers, conn } = req;
@@ -36,7 +37,7 @@ export const ws = (cb) => {
                 const { fn, args } = JSON.parse(ev);
                 const it = cb({ fn, args });
                 const send = () =>
-                  Promise.resolve(it.next()).then(({ value, done }) => {
+                  Promise.resolve(it.next()).then(async ({ value, done }) => {
                     if (!done) {
                       await sock.send(JSON.stringify({ fn, ret: value }));
                       send();
