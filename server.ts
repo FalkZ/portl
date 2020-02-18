@@ -24,6 +24,7 @@ export const ws = async (cb) => {
         async (sock: WebSocket): Promise<void> => {
           console.log("socket connected!");
           const it = sock.receive();
+
           while (true) {
             try {
               const { done, value } = await it.next();
@@ -34,16 +35,7 @@ export const ws = async (cb) => {
               if (typeof ev === "string") {
                 // text message
                 console.log("ws:Text", ev);
-                const { fn, args } = JSON.parse(ev);
-                const it = cb({ fn, args });
-                const send = () =>
-                  Promise.resolve(it.next()).then(async ({ value, done }) => {
-                    if (!done) {
-                      await sock.send(JSON.stringify({ fn, ret: value }));
-                      send();
-                    }
-                  });
-                send();
+                cb({ sock, data: ev });
               } else if (ev instanceof Uint8Array) {
                 // binary message
                 console.log("ws:Binary", ev);

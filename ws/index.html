@@ -8,19 +8,68 @@
   <body>
     <script>
       var connection = new WebSocket("ws://localhost:8080");
-      // When the connection is open, send some data to the server
+
+      const cbs = [];
+      const freeIDs = [];
+      window.id = freeIDs;
+
       connection.onopen = function() {
-        connection.send(JSON.stringify({ fn: "sub", args: [{ a: "fdsaas" }] }));
+        window.portl = new Proxy(
+          {},
+          {
+            get: (target, key, proxy) => (...args) => ({
+              _setID: function(cb) {
+                let id = freeIDs.shift();
+                if (id !== undefined) {
+                  cbs[id] = cb;
+                } else {
+                  id = cbs.push(cb) - 1;
+                }
+                this.id = id;
+              },
+              then: function(cb) {
+                this._setID(cb);
+                connection.send(
+                  JSON.stringify({ fn: key, once: true, args, id: this.id })
+                );
+              },
+
+              subscribe: function(cb) {
+                this._setID(cb);
+                connection.send(
+                  JSON.stringify({ fn: key, once: false, args, id: this.id })
+                );
+              },
+              unsubscribe: function() {
+                console.log(this);
+                connection.send(
+                  JSON.stringify({ fn: key, done: true, id: this.id })
+                );
+              }
+            })
+          }
+        );
       };
 
-      // Log errors
+      const unsubscribeID = (id) => {
+        freeIDs.push(id);
+        cbs[id] = () => {};
+      };
+
+      connection.onmessage = function({ data }) {
+        const { id, ret, once, done } = JSON.parse(data);
+        if (done) {
+          unsubscribeID(id);
+        } else {
+          cbs[id](ret);
+          if (once) {
+            unsubscribeID(id);
+          }
+        }
+      };
+
       connection.onerror = function(error) {
         console.log("WebSocket Error " + error);
-      };
-
-      // Log messages from the server
-      connection.onmessage = function(e) {
-        console.log("Server: " + e.data);
       };
     </script>
   </body>
