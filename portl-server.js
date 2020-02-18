@@ -1,7 +1,8 @@
 import { ws } from "./ws.js";
-import { dirname, join } from "https://deno.land/std/path/mod.ts";
+import { join } from "https://deno.land/std/path/mod.ts";
 
-const file = join(dirname(import.meta.url), Deno.args[0]);
+const file = join("file:///", Deno.cwd(), Deno.args[0]);
+
 const toServe = await import(file);
 console.log("serving: ", file);
 
