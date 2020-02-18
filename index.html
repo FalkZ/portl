@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      window.portl = new Proxy(
+        {},
+        {
+          get: (target, key, proxy) => (...data) => {
+            const prom = fetch(`http://localhost:8000/${key}`, {
+              method: "POST", // *GET, POST, PUT, DELETE, etc.
+
+              headers: {
+                "Content-Type": "application/json"
+              },
+
+              body: JSON.stringify(data)
+            });
+
+            return {
+              then: (cb) =>
+                prom
+                  .then((response) => {
+                    if (!response.ok) {
+                      return response.text().then((error) => {
+                        throw new Error(error);
+                      });
+                    } else {
+                      return response.json();
+                    }
+                  })
+                  .then(cb),
+
+              subscribe: (cb) => {
+                prom.then((response) => {
+                  const reader = response.body.getReader();
+                  var dec = new TextDecoder("utf-8");
+
+                  reader.read().then(function processText({ done, value }) {
+                    // Result objects contain two properties:
+                    // done  - true if the stream has already given you all its data.
+                    // value - some data. Always undefined when done is true.
+                    if (done) {
+                      console.log("Stream complete");
+
+                      return;
+                    }
+
+                    cb(dec.decode(value));
+                    return reader.read().then(processText);
+                  });
+                });
+              }
+            };
+          }
+        }
+      );
+    </script>
+  </body>
+</html>
