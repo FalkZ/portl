@@ -1,6 +1,7 @@
 # portl
 
-> 0 configuration backend, for serving js functions and generators
+0 configuration backend, for serving js functions and generators
+
 ## Usage
 
 1. Create a file that exports the functions you want to expose.
