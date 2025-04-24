@@ -14,6 +14,5 @@
 {/if}
 
 {#each state.snippets as snippet}
-    snippet:
     {@render snippet()}
 {/each}
