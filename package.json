@@ -1,6 +1,6 @@
 {
     "name": "portl",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "A lightweight portal library for Svelte 5",
     "author": "FalkZ",
     "license": "MIT",
@@ -13,7 +13,7 @@
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/FalkZ/portl.git"
+        "url": "git+https://github.com/FalkZ/portl.git"
     },
     "scripts": {
         "dev": "vite dev",
@@ -45,6 +45,9 @@
     },
     "peerDependencies": {
         "svelte": "^5.0.0"
+    },
+    "dependencies": {
+        "esm-env": "^1.2.2"
     },
     "devDependencies": {
         "@sveltejs/adapter-auto": "^3.0.0",

@@ -1,6 +1,7 @@
 <script lang="ts">
     import { untrack } from "svelte";
     import { type ChildrenSnippet, PortalState } from "./portal.svelte.js";
+    import { BROWSER } from "esm-env";
 
     type Props = {
         children?: ChildrenSnippet;
@@ -9,12 +10,13 @@
 
     let { children, state }: Props = $props();
 
-    $effect(() => {
-        let snippet = children;
-        untrack(() => state.addSnippet(snippet));
+    if (BROWSER)
+        $effect(() => {
+            let snippet = children;
+            untrack(() => state.addSnippet(snippet));
 
-        return () => {
-            untrack(() => state.removeSnippet(snippet));
-        };
-    });
+            return () => {
+                untrack(() => state.removeSnippet(snippet));
+            };
+        });
 </script>

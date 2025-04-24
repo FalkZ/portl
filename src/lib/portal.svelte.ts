@@ -1,6 +1,6 @@
 import type { Component, Snippet } from "svelte";
 import Receiver from "./receiver.svelte";
-import Portal from "$lib/portal.svelte";
+import Portal from "./portal.svelte";
 
 export type ChildrenSnippet = Snippet<[]>;
 
