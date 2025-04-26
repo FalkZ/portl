@@ -99,14 +99,14 @@ Therefore it is better to define conditional rendering inside of the portal when
 
 ```svelte
 <Title.Portal>
-    {#if condition}✅ This will always rendered first{/if}
+    {#if condition}✅ This will always render first{/if}
 </Title.Portal>
-<Title.Portal>✅ This will always rendered second</Title.Portal>
+<Title.Portal>✅ This will always render second</Title.Portal>
 ```
 
 Rather than:
 
 ```svelte
-{#if condition}<Title.Portal>❌ This will NOT always be rendered first</Title.Portal>{/if}
-<Title.Portal>❌ This will NOT always rendered second</Title.Portal>
+{#if condition}<Title.Portal>❌ This will NOT always render first</Title.Portal>{/if}
+<Title.Portal>❌ This will NOT always render second</Title.Portal>
 ```

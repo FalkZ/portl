@@ -28,6 +28,7 @@ type PortalComponent = Component<{ children: ChildrenSnippet }, {}, "">;
 
 type ReceiverComponent = Component<{ placeholder?: ChildrenSnippet }, {}, "">;
 
+// always update /types/index.dts when changing the interface
 export const createPortal = (): {
     Receiver: ReceiverComponent;
     Portal: PortalComponent;
