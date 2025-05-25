@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { type ChildrenSnippet, PortalState } from "./portal.svelte.js";
+    import { type ChildrenSnippet, PortalState } from "./portal-state.svelte.js";
     import { BROWSER } from "esm-env";
 
     type Props = {
