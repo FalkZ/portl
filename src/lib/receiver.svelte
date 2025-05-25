@@ -1,9 +1,10 @@
 <script lang="ts">
-    import { type ChildrenSnippet, PortalState } from "./portal-state.svelte.js";
+    import type { Snippet } from "svelte";
+    import type { PortalState } from "./portal-state.svelte.js";
     import { BROWSER } from "esm-env";
 
     type Props = {
-        placeholder?: ChildrenSnippet;
+        placeholder?: Snippet;
         state: PortalState;
     };
 

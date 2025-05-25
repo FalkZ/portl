@@ -2,18 +2,16 @@ import type { Component, Snippet } from "svelte";
 import Receiver from "./receiver.svelte";
 import Portal from "./portal.svelte";
 
-export type ChildrenSnippet = Snippet<[]>;
-
 export class PortalState {
-    snippets: ChildrenSnippet[] = $state([]);
+    snippets: Snippet[] = $state([]);
 
-    addSnippet(snippet?: ChildrenSnippet) {
+    addSnippet(snippet?: Snippet) {
         if (snippet) {
             this.snippets.push(snippet);
         }
     }
 
-    removeSnippet(snippet?: ChildrenSnippet) {
+    removeSnippet(snippet?: Snippet) {
         if (snippet) {
             let index = this.snippets.indexOf(snippet);
             while (index !== -1) {
@@ -24,9 +22,9 @@ export class PortalState {
     }
 }
 
-type PortalComponent = Component<{ children: ChildrenSnippet }, {}, "">;
+type PortalComponent = Component<{ children: Snippet }, {}, "">;
 
-type ReceiverComponent = Component<{ placeholder?: ChildrenSnippet }, {}, "">;
+type ReceiverComponent = Component<{ placeholder?: Snippet }, {}, "">;
 
 /**
  * Creates a `Portal` and `Receiver` svelte component:
