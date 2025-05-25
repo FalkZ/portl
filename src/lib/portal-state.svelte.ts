@@ -1,4 +1,4 @@
-import type { Component, Snippet } from "svelte";
+import type { Component, ComponentProps, Snippet } from "svelte";
 import Receiver from "./receiver.svelte";
 import Portal from "./portal.svelte";
 
@@ -22,9 +22,7 @@ export class PortalState {
     }
 }
 
-type PortalComponent = Component<{ children: Snippet }, {}, "">;
-
-type ReceiverComponent = Component<{ placeholder?: Snippet }, {}, "">;
+type Resolve<T> = T extends infer U ? { [K in keyof U]: U[K] } : never;
 
 /**
  * Creates a `Portal` and `Receiver` svelte component:
@@ -34,16 +32,13 @@ type ReceiverComponent = Component<{ placeholder?: Snippet }, {}, "">;
  * @returns An object containing the Portal and Receiver components
  */
 export const createPortal = (): {
-    Receiver: ReceiverComponent;
-    Portal: PortalComponent;
+    Receiver: Component<Resolve<Omit<ComponentProps<typeof Receiver>, "state">>>;
+    Portal: Component<Resolve<Omit<ComponentProps<typeof Portal>, "state">>>;
 } => {
     const state = new PortalState();
 
-    const receiver: ReceiverComponent = (internals, { placeholder }) =>
-        Receiver(internals, { state, placeholder });
-
-    const portal: PortalComponent = (internals, { children }) =>
-        Portal(internals, { state, children });
-
-    return { Receiver: receiver, Portal: portal };
+    return {
+        Receiver: (internals, { placeholder }) => Receiver(internals, { state, placeholder }),
+        Portal: (internals, { children }) => Portal(internals, { state, children }),
+    };
 };
