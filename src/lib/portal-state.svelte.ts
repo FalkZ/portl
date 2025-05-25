@@ -48,7 +48,7 @@ type Resolve<T> = T extends infer U ? { [K in keyof U]: U[K] } : never;
  *
  *    <!-- This is where the title will be rendered. -->
  *    <Title.Receiver />
- * 
+ *
  *    <!-- Or specify a placeholder to render when no portal is present. -->
  *    <Title.Receiver>
  *      {#snippet placeholder()}
