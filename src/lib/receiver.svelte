@@ -4,6 +4,9 @@
     import { BROWSER } from "esm-env";
 
     type Props = {
+        /**
+         * Placeholder content to render when there are no portals.
+         */
         placeholder?: Snippet;
         state: PortalState;
     };
