@@ -11,7 +11,7 @@
         {@render placeholder?.()}
     {/if}
 
-    {#each state.snippets as snippet}
+    {#each state.snippets as snippet (snippet)}
         {@render snippet()}
     {/each}
 {/if}

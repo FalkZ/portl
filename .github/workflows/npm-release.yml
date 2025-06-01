@@ -1,4 +1,4 @@
-name: Release to NPM
+name: NPM Release
 
 on:
     release:
@@ -23,6 +23,9 @@ jobs:
 
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
+
+            - name: Lint
+              run: pnpm lint
 
             - name: Build
               run: pnpm build

@@ -1,0 +1,47 @@
+name: Github Release
+
+on:
+    push:
+        branches:
+            - main
+        # paths:
+        #     - package.json
+
+jobs:
+    check-version-and-release:
+        runs-on: ubuntu-latest
+        outputs:
+            version: ${{ steps.get-version.outputs.version }}
+            released: ${{ steps.check-tag.outputs.released }}
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Get Version
+              id: get-version
+              run: |
+                  VERSION=$(node -p "require('./package.json').version")
+                  echo "version=v$VERSION" >> $GITHUB_OUTPUT
+                  echo "Current version: v$VERSION"
+
+            - name: Check If Release Exists
+              id: check-tag
+              run: |
+                  TAG=${{ steps.get-version.outputs.version }}
+                  if gh release view "$TAG" &>/dev/null; then
+                    echo "Release $TAG already exists, skipping release"
+                    echo "released=true" >> $GITHUB_OUTPUT
+                  else
+                    echo "Release $TAG does not exist, will create release"
+                    echo "released=false" >> $GITHUB_OUTPUT
+                  fi
+
+            - name: Create Release
+              if: steps.check-tag.outputs.released == 'false'
+              uses: softprops/action-gh-release@v1
+              with:
+                  tag_name: ${{ steps.get-version.outputs.version }}
+                  name: Release ${{ steps.get-version.outputs.version }}
+                  generate_release_notes: true
