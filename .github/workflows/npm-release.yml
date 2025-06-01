@@ -29,7 +29,6 @@ jobs:
             - name: Get package version
               id: package-version
               run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-              working-directory: ./portl
 
             - name: Check if version tag exists
               id: check-tag
@@ -43,12 +42,10 @@ jobs:
             - name: Install dependencies
               if: steps.check-tag.outputs.exists == 'false'
               run: pnpm install
-              working-directory: ./portl
 
             - name: Build package
               if: steps.check-tag.outputs.exists == 'false'
               run: pnpm build
-              working-directory: ./portl
 
             - name: Create tag
               if: steps.check-tag.outputs.exists == 'false'
@@ -61,6 +58,5 @@ jobs:
             - name: Publish to NPM
               if: steps.check-tag.outputs.exists == 'false'
               run: pnpm publish --no-git-checks
-              working-directory: ./portl
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
