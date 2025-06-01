@@ -1,17 +1,9 @@
 <script lang="ts">
-    import type { Snippet } from "svelte";
+    import type { ReceiverProps } from "./props-types.js";
     import type { PortalState } from "./portal-state.svelte.js";
     import { BROWSER } from "esm-env";
 
-    type Props = {
-        /**
-         * Placeholder content to render when there are no portals.
-         */
-        placeholder?: Snippet;
-        state: PortalState;
-    };
-
-    let { placeholder, state }: Props = $props();
+    let { placeholder, state }: ReceiverProps & { state: PortalState } = $props();
 </script>
 
 {#if BROWSER}

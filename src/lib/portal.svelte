@@ -1,14 +1,10 @@
 <script lang="ts">
+    import type { PortalProps } from "./props-types.js";
     import { untrack, type Snippet } from "svelte";
     import type { PortalState } from "./portal-state.svelte.js";
     import { BROWSER } from "esm-env";
 
-    type Props = {
-        children?: Snippet;
-        state: PortalState;
-    };
-
-    let { children, state }: Props = $props();
+    let { children, state }: PortalProps & { state: PortalState } = $props();
 
     if (BROWSER)
         $effect(() => {
