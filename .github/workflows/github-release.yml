@@ -1,11 +1,11 @@
-name: Github Release
+name: Version Release
 
 on:
     push:
         branches:
             - main
         # paths:
-        #     - package.json
+        #     - "package.json"
 
 jobs:
     check-version-and-release:
@@ -26,22 +26,25 @@ jobs:
                   echo "version=v$VERSION" >> $GITHUB_OUTPUT
                   echo "Current version: v$VERSION"
 
-            - name: Check If Release Exists
+            - name: Check If Tag Exists
               id: check-tag
               run: |
                   TAG=${{ steps.get-version.outputs.version }}
-                  if gh release view "$TAG" &>/dev/null; then
-                    echo "Release $TAG already exists, skipping release"
+                  if git tag -l "$TAG" | grep -q "$TAG"; then
+                    echo "Tag $TAG already exists, skipping release"
                     echo "released=true" >> $GITHUB_OUTPUT
                   else
-                    echo "Release $TAG does not exist, will create release"
+                    echo "Tag $TAG does not exist, will create release"
                     echo "released=false" >> $GITHUB_OUTPUT
                   fi
 
             - name: Create Release
               if: steps.check-tag.outputs.released == 'false'
-              uses: softprops/action-gh-release@v1
+              uses: actions/create-release@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
                   tag_name: ${{ steps.get-version.outputs.version }}
-                  name: Release ${{ steps.get-version.outputs.version }}
-                  generate_release_notes: true
+                  release_name: Release ${{ steps.get-version.outputs.version }}
+                  draft: false
+                  prerelease: false
