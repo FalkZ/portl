@@ -1,10 +1,10 @@
 <script lang="ts">
-    import { untrack } from "svelte";
-    import { type ChildrenSnippet, PortalState } from "./portal.svelte.js";
+    import { untrack, type Snippet } from "svelte";
+    import type { PortalState } from "./portal-state.svelte.js";
     import { BROWSER } from "esm-env";
 
     type Props = {
-        children?: ChildrenSnippet;
+        children?: Snippet;
         state: PortalState;
     };
 
