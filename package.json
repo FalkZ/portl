@@ -4,6 +4,7 @@
     "description": "A lightweight portal library for Svelte 5",
     "author": "FalkZ",
     "license": "MIT",
+    "type": "module",
     "keywords": [
         "svelte",
         "portal",
@@ -37,7 +38,6 @@
     ],
     "svelte": "./dist/index.js",
     "types": "./dist/index.d.ts",
-    "type": "module",
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",

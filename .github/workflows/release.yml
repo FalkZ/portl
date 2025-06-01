@@ -60,10 +60,17 @@ jobs:
                   fi
 
             - name: Publish to NPM
+              run: pnpm publish --access public --no-git-checks
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+            - name: Create Git Tag
               if: steps.check-tag.outputs.released == 'false'
-              uses: simenandre/publish-with-pnpm@v2
-              with:
-                  npm-auth-token: ${{ secrets.NPM_TOKEN }}
+              run: |
+                  git config --global user.name "GitHub Actions"
+                  git config --global user.email "actions@github.com"
+                  git tag ${{ steps.get-version.outputs.version }}
+                  git push origin ${{ steps.get-version.outputs.version }}
 
             - name: Create GitHub Release
               if: steps.check-tag.outputs.released == 'false'
@@ -74,3 +81,5 @@ jobs:
                   draft: false
                   prerelease: false
                   token: ${{ secrets.GITHUB_TOKEN }}
+                  body: |
+                      [NPM Package](https://www.npmjs.com/package/${{ github.repository.split('/')[1] }}/v/${{ steps.get-version.outputs.version }})
