@@ -24,6 +24,13 @@ export class PortalState {
 }
 
 /**
+ * The resulting type is structurally identical to the parameter T.
+ * It only forces typescript to show the fully resolved type.
+ * This helps users of the library.
+ */
+type AsResolved<T> = T extends infer U ? { [K in keyof U]: U[K] } : never;
+
+/**
  * Creates a `Portal` and `Receiver` svelte component:
  *
  * `Portal` renders its child content at the location of the `Receiver`.
@@ -75,12 +82,12 @@ export const createPortal = (): {
      * Receiver component that listens for snippets and renders them
      * at the location of the `Receiver`.
      */
-    Receiver: Component<ReceiverProps>;
+    Receiver: Component<AsResolved<ReceiverProps>>;
     /**
      * Portal component that renders its child content at the location
      * of the `Receiver`.
      */
-    Portal: Component<PortalProps>;
+    Portal: Component<AsResolved<PortalProps>>;
 } => {
     const state = new PortalState();
 
