@@ -1,4 +1,4 @@
-name: Version Release
+name: Github Release
 
 on:
     push:
