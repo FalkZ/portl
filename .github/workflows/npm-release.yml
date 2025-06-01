@@ -1,9 +1,8 @@
-name: NPM Release
+name: Release to NPM
 
 on:
-    push:
-        branches:
-            - main
+    release:
+        types: [published]
 
 jobs:
     release:
@@ -11,52 +10,24 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-              with:
-                  fetch-depth: 0
 
-            - name: Setup Node.js
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+
+            - name: Setup Node LTS
               uses: actions/setup-node@v4
               with:
-                  node-version: "22"
-                  registry-url: "https://registry.npmjs.org"
-
-            - name: Install PNPM
-              uses: pnpm/action-setup@v3
-              with:
-                  version: 8
-                  run_install: false
-
-            - name: Get package version
-              id: package-version
-              run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-
-            - name: Check if version tag exists
-              id: check-tag
-              run: |
-                  if git tag -l "v${{ steps.package-version.outputs.version }}" | grep -q .; then
-                    echo "exists=true" >> $GITHUB_OUTPUT
-                  else
-                    echo "exists=false" >> $GITHUB_OUTPUT
-                  fi
+                  node-version: lts/*
+                  registry-url: https://registry.npmjs.org
+                  cache: pnpm
 
             - name: Install dependencies
-              if: steps.check-tag.outputs.exists == 'false'
-              run: pnpm install
+              run: pnpm install --frozen-lockfile
 
-            - name: Build package
-              if: steps.check-tag.outputs.exists == 'false'
+            - name: Build
               run: pnpm build
 
-            - name: Create tag
-              if: steps.check-tag.outputs.exists == 'false'
-              run: |
-                  git config --local user.email "github-actions[bot]@users.noreply.github.com"
-                  git config --local user.name "github-actions[bot]"
-                  git tag -a "v${{ steps.package-version.outputs.version }}" -m "Release v${{ steps.package-version.outputs.version }}"
-                  git push origin "v${{ steps.package-version.outputs.version }}"
-
-            - name: Publish to NPM
-              if: steps.check-tag.outputs.exists == 'false'
-              run: pnpm publish --no-git-checks
-              env:
-                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+            - name: Publish
+              uses: simenandre/publish-with-pnpm@v2
+              with:
+                  npm-auth-token: ${{ secrets.NPM_TOKEN }}
