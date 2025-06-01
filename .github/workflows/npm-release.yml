@@ -1,0 +1,66 @@
+name: NPM Release
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    release:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "22"
+                  registry-url: "https://registry.npmjs.org"
+
+            - name: Install PNPM
+              uses: pnpm/action-setup@v3
+              with:
+                  version: 8
+                  run_install: false
+
+            - name: Get package version
+              id: package-version
+              run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+              working-directory: ./portl
+
+            - name: Check if version tag exists
+              id: check-tag
+              run: |
+                  if git tag -l "v${{ steps.package-version.outputs.version }}" | grep -q .; then
+                    echo "exists=true" >> $GITHUB_OUTPUT
+                  else
+                    echo "exists=false" >> $GITHUB_OUTPUT
+                  fi
+
+            - name: Install dependencies
+              if: steps.check-tag.outputs.exists == 'false'
+              run: pnpm install
+              working-directory: ./portl
+
+            - name: Build package
+              if: steps.check-tag.outputs.exists == 'false'
+              run: pnpm build
+              working-directory: ./portl
+
+            - name: Create tag
+              if: steps.check-tag.outputs.exists == 'false'
+              run: |
+                  git config --local user.email "github-actions[bot]@users.noreply.github.com"
+                  git config --local user.name "github-actions[bot]"
+                  git tag -a "v${{ steps.package-version.outputs.version }}" -m "Release v${{ steps.package-version.outputs.version }}"
+                  git push origin "v${{ steps.package-version.outputs.version }}"
+
+            - name: Publish to NPM
+              if: steps.check-tag.outputs.exists == 'false'
+              run: pnpm publish --no-git-checks
+              working-directory: ./portl
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
