@@ -51,7 +51,7 @@ You can provide a placeholder when no portal content is present:
 <script>
     import { createPortal } from "portl";
 
-    const Modal = createPortal();
+    const Title = createPortal();
 </script>
 
 <Title.Receiver>
